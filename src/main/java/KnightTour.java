@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Random;
+
 public class KnightTour {
 
     private int boardSize;
@@ -46,8 +49,19 @@ public class KnightTour {
         return false;
     }
 
+    class nextField {
+        public int safeCount;
+        public int i;
+
+        public nextField(int safeCount, int i) {
+            this.safeCount = safeCount;
+            this.i = i;
+        }
+    }
+
     private ChessField inspectNeighbours(int x, int y) {
         int safeCount = 0, minSafe = Integer.MAX_VALUE, bestMove = -1;
+        ArrayList<nextField> possibleNextFields = new ArrayList<>();
 
         for (int i = 0; i < xMove.length; i++) {
             int nextX, nextY, nextNextX, nextNextY;
@@ -62,6 +76,7 @@ public class KnightTour {
                         ++safeCount;
                     }
                 }
+                possibleNextFields.add(new nextField(safeCount,i));
                 if(safeCount < minSafe) {
                     minSafe = safeCount;
                     bestMove = i;
@@ -69,6 +84,14 @@ public class KnightTour {
             }
             safeCount = 0;
         }
+
+        possibleNextFields.sort((o1, o2) -> o1.safeCount - o2.safeCount);
+        int sameSafeCount = 0;
+        for (nextField f : possibleNextFields)
+            if (f.safeCount == minSafe)
+                sameSafeCount++;
+        bestMove = possibleNextFields.get(new Random().nextInt(sameSafeCount)).i;
+
         if (bestMove == -1) return new ChessField(-1, -1, ChessField.NOT_VISITED);
         return new ChessField(x + xMove[bestMove], y + yMove[bestMove], ChessField.NOT_VISITED);
     }
