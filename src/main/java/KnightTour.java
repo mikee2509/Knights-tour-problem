@@ -90,7 +90,7 @@ public class KnightTour {
         for (nextField f : possibleNextFields)
             if (f.safeCount == minSafe)
                 sameSafeCount++;
-        bestMove = possibleNextFields.get(new Random().nextInt(sameSafeCount)).i;
+        bestMove = sameSafeCount > 0 ? possibleNextFields.get(new Random().nextInt(sameSafeCount)).i : -1;
 
         if (bestMove == -1) return new ChessField(-1, -1, ChessField.NOT_VISITED);
         return new ChessField(x + xMove[bestMove], y + yMove[bestMove], ChessField.NOT_VISITED);
