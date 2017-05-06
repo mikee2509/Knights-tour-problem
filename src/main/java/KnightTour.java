@@ -1,5 +1,7 @@
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.maxBy;
 
 public class KnightTour {
 
@@ -33,38 +35,30 @@ public class KnightTour {
 
     private boolean solve(int x, int y, int moveIdx) {
         int next_x, next_y;
-
-        if (moveIdx == boardSize * boardSize)
+        if (moveIdx == boardSize * boardSize) {
             return true;
+        }
 
         ChessField bestNeighbour = inspectNeighbours(x, y);
-        if (bestNeighbour.getxPos() == -1) return false;
+        if (bestNeighbour.getxPos() == -1) {
+            return false;
+        }
+
         next_x = bestNeighbour.getxPos();
         next_y = bestNeighbour.getyPos();
         board[next_x][next_y].setVal(moveIdx);
-
         if (solve(next_x, next_y, moveIdx + 1)) {
             return true;
         }
         return false;
     }
 
-    class nextField {
-        public int safeCount;
-        public int i;
-
-        public nextField(int safeCount, int i) {
-            this.safeCount = safeCount;
-            this.i = i;
-        }
-    }
-
     private ChessField inspectNeighbours(int x, int y) {
-        int safeCount = 0, minSafe = Integer.MAX_VALUE, bestMove = -1;
-        ArrayList<nextField> possibleNextFields = new ArrayList<>();
+        int nextX, nextY, nextNextX, nextNextY, safeCount = 0, minSafe = Integer.MAX_VALUE;
+        ChessField bestCandidate = new ChessField(-1, -1, ChessField.NOT_VISITED);
+        Map<ChessField, Integer> nextCandidates = new HashMap<>();
 
         for (int i = 0; i < xMove.length; i++) {
-            int nextX, nextY, nextNextX, nextNextY;
             nextX = x + xMove[i];
             nextY = y + yMove[i];
 
@@ -76,28 +70,28 @@ public class KnightTour {
                         ++safeCount;
                     }
                 }
-                possibleNextFields.add(new nextField(safeCount,i));
-                if(safeCount < minSafe) {
+                if(safeCount <= minSafe) {
+                    nextCandidates.put(new ChessField(nextX, nextY, ChessField.NOT_VISITED), safeCount);
                     minSafe = safeCount;
-                    bestMove = i;
                 }
             }
             safeCount = 0;
         }
+        if (nextCandidates.size() == 0) {
+            return bestCandidate;
+        }
 
-        possibleNextFields.sort((o1, o2) -> o1.safeCount - o2.safeCount);
-        int sameSafeCount = 0;
-        for (nextField f : possibleNextFields)
-            if (f.safeCount == minSafe)
-                sameSafeCount++;
-        bestMove = sameSafeCount > 0 ? possibleNextFields.get(new Random().nextInt(sameSafeCount)).i : -1;
+        Integer min = nextCandidates.values().stream().min(Integer::compare).get();
+        List<ChessField> minCandidates = nextCandidates.keySet().stream().filter(
+                t->nextCandidates.get(t).equals(min)).collect(Collectors.toList());
 
-        if (bestMove == -1) return new ChessField(-1, -1, ChessField.NOT_VISITED);
-        return new ChessField(x + xMove[bestMove], y + yMove[bestMove], ChessField.NOT_VISITED);
+        return minCandidates.get(new Random().nextInt(minCandidates.size()));
     }
 
     public boolean solveKnightTourWrapper(int startX, int startY, boolean disablePrinting) {
-        if(!disablePrinting) System.out.println("Rozwiazaniem jest\n");
+        if(!disablePrinting) {
+            System.out.println("Rozwiazaniem jest\n");
+        }
         boardInit(startX, startY);
         if (!solve(startX, startY, 1)) {
             if(!disablePrinting) System.out.println("Brak rozwiazania");
@@ -119,7 +113,7 @@ public class KnightTour {
     }
 
     public static void main(String... arg) {
-        KnightTour knightTour = new KnightTour(8);
-        knightTour.solveKnightTourWrapper(0,0, false);
+        KnightTour knightTour = new KnightTour(7);
+        knightTour.solveKnightTourWrapper(6,6, false);
     }
 }

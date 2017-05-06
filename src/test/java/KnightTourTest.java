@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class KnightTourTest {
-    private static final int MAX_TESTED_BOARD_SIZE = 12;
+    private static final int MAX_TESTED_BOARD_SIZE = 50;
     private static final int MIN_TESTED_BOEARD_SIZE = 5;
 
     private int boardSize;
