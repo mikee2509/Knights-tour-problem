@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 public class KnightTourTest {
     private static final int MAX_TESTED_BOARD_SIZE = 50;
     private static final int MIN_TESTED_BOEARD_SIZE = 5;
+    public static final int NUMBER_OF_ATTEMPTS = 5;
 
     private int boardSize;
     private int startX;
@@ -30,9 +31,9 @@ public class KnightTourTest {
     }
 
     // Corners:
-    // |0| |1|
-    // | | | |
-    // |3| |2|
+    // |0|_|1|
+    // |_|_|_|
+    // |3|_|2|
     public KnightTourTest(int boardSize, int corner) {
         this.boardSize = boardSize;
         switch (corner){
@@ -56,7 +57,7 @@ public class KnightTourTest {
     @Test
     public void solveKnightTourWrapper() {
         KnightTour knightTour = new KnightTour(boardSize);
-        assertTrue(knightTour.solveKnightTourWrapper(startX, startY, true));
+        assertTrue(knightTour.solveKnightTourWrapper(startX, startY, NUMBER_OF_ATTEMPTS, true));
     }
 
 }
