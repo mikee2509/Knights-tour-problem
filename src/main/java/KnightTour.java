@@ -116,6 +116,33 @@ public class KnightTour {
         board[startX][startY].setVal(0);
     }
 
+    // Corners:
+    // |0|_|1|
+    // |_|_|_|
+    // |3|_|2|
+    public static int[] getStartXY(int boardSize, int corner) {
+        int[] startXY = new int[2];
+        switch (corner){
+            case 0:
+                startXY[0] = startXY[1] = 0;
+                break;
+            case 1:
+                startXY[0] = 0;
+                startXY[1] = boardSize - 1;
+                break;
+            case 2:
+                startXY[0] = startXY[1] = boardSize - 1;
+                break;
+            case 3:
+                startXY[0] = boardSize - 1;
+                startXY[1] = 0;
+                break;
+            default:
+                startXY[0] = startXY[1] = -1;
+        }
+        return startXY;
+    }
+
     public static void main(String... arg) {
         if(arg.length < 2 || arg.length > 3) {
             printUsage();
@@ -131,24 +158,14 @@ public class KnightTour {
             printUsage();
             return;
         }
-        switch (corner){
-            case 0:
-                startX = startY = 0;
-                break;
-            case 1:
-                startX = 0;
-                startY = boardSize - 1;
-                break;
-            case 2:
-                startX = startY = boardSize - 1;
-                break;
-            case 3:
-                startX = boardSize - 1;
-                startY = 0;
-                break;
-            default:
-                printUsage();
-                return;
+        int[] startXY = getStartXY(boardSize, corner);
+        if(startXY[0] != -1) {
+            startX = startXY[0];
+            startY = startXY[1];
+        }
+        else {
+            printUsage();
+            return;
         }
         if(boardSize < 0 || numAttempts < 0) {
             printUsage();

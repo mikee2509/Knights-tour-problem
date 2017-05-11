@@ -36,22 +36,9 @@ public class KnightTourTest {
     // |3|_|2|
     public KnightTourTest(int boardSize, int corner) {
         this.boardSize = boardSize;
-        switch (corner){
-            case 0:
-                startX = startY = 0;
-                break;
-            case 1:
-                startX = 0;
-                startY = boardSize - 1;
-                break;
-            case 2:
-                startX = startY = boardSize - 1;
-                break;
-            case 3:
-                startX = boardSize - 1;
-                startY = 0;
-                break;
-        }
+        int[] startXY = KnightTour.getStartXY(boardSize, corner);
+        startX = startXY[0];
+        startY = startXY[1];
     }
 
     @Test
