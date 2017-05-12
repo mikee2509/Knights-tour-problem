@@ -10,9 +10,9 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
 public class KnightTourTest {
-    private static final int MAX_TESTED_BOARD_SIZE = 50;
-    private static final int MIN_TESTED_BOEARD_SIZE = 5;
-    public static final int NUMBER_OF_ATTEMPTS = 5;
+    private static final int MAX_TESTED_BOARD_SIZE = 80;
+    private static final int MIN_TESTED_BOARD_SIZE = 5;
+    public static final int NUMBER_OF_ATTEMPTS = 10;
 
     private int boardSize;
     private int startX;
@@ -20,8 +20,8 @@ public class KnightTourTest {
 
     @Parameters(name = "boardSize({0})   corner({1})")
     public static Collection<Object[]> data() {
-        Integer list[][] = new Integer[4 * (MAX_TESTED_BOARD_SIZE - MIN_TESTED_BOEARD_SIZE + 1)][2];
-        for (int i = 0, size = MIN_TESTED_BOEARD_SIZE - 1, corner; i < list.length; i++) {
+        Integer list[][] = new Integer[4 * (MAX_TESTED_BOARD_SIZE - MIN_TESTED_BOARD_SIZE + 1)][2];
+        for (int i = 0, size = MIN_TESTED_BOARD_SIZE - 1, corner; i < list.length; i++) {
             corner = i%4;
             if(corner == 0) ++size;
             list[i][0] = size;
