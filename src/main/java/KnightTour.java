@@ -4,11 +4,11 @@ import java.util.stream.Collectors;
 public class KnightTour {
 
     private int boardSize;
+    private static final int DEFAULT_NO_OF_ATTEMPTS = 5;
     private static ChessField board[][];
 
     private static final int xMove[] = { 2, 1, -1, -2, -2, -1,  1,  2 };
     private static final int yMove[] = { 1, 2,  2,  1, -1, -2, -2, -1 };
-
 
 
     public KnightTour(int boardSize) {
@@ -34,20 +34,20 @@ public class KnightTour {
     }
 
     private boolean solve(int x, int y, int moveIdx) {
-        int next_x, next_y;
+        int nextX, nextY;
         if (moveIdx == boardSize * boardSize) {
             return true;
         }
 
         ChessField bestNeighbour = inspectNeighbours(x, y);
-        if (bestNeighbour.getxPos() == -1) {
+        if (bestNeighbour.getxPos() < 0) {
             return false;
         }
 
-        next_x = bestNeighbour.getxPos();
-        next_y = bestNeighbour.getyPos();
-        board[next_x][next_y].setVal(moveIdx);
-        if (solve(next_x, next_y, moveIdx + 1)) {
+        nextX = bestNeighbour.getxPos();
+        nextY = bestNeighbour.getyPos();
+        board[nextX][nextY].setVal(moveIdx);
+        if (solve(nextX, nextY, moveIdx + 1)) {
             return true;
         }
         return false;
@@ -55,7 +55,7 @@ public class KnightTour {
 
     private ChessField inspectNeighbours(int x, int y) {
         int nextX, nextY, nextNextX, nextNextY, safeCount = 0, minSafe = Integer.MAX_VALUE;
-        ChessField bestCandidate = new ChessField(-1, -1, ChessField.NOT_VISITED);
+        ChessField emptyField = new ChessField(-1, -1, ChessField.NOT_VISITED);
         Map<ChessField, Integer> nextCandidates = new HashMap<>();
 
         for (int i = 0; i < xMove.length; i++) {
@@ -71,19 +71,24 @@ public class KnightTour {
                     }
                 }
                 if(safeCount <= minSafe) {
-                    nextCandidates.put(new ChessField(nextX, nextY, ChessField.NOT_VISITED), safeCount);
+                    nextCandidates.put(board[nextX][nextY], safeCount);
                     minSafe = safeCount;
                 }
             }
             safeCount = 0;
         }
         if (nextCandidates.size() == 0) {
-            return bestCandidate;
+            return emptyField;
         }
 
-        Integer min = nextCandidates.values().stream().min(Integer::compare).get();
-        List<ChessField> minCandidates = nextCandidates.keySet().stream().filter(
-                t->nextCandidates.get(t).equals(min)).collect(Collectors.toList());
+        Integer min = nextCandidates.values().stream()
+                .min(Integer::compare)
+                .get();
+
+        List<ChessField> minCandidates = nextCandidates.keySet().stream()
+                .filter(t->nextCandidates.get(t).equals(min))
+                .collect(Collectors.toList());
+
         return minCandidates.get(new Random().nextInt(minCandidates.size()));
     }
 
@@ -93,7 +98,6 @@ public class KnightTour {
         while(!solve(startX, startY, 1)) {
             boardInit(startX, startY);
             ++i;
-            //System.out.println("Attempt number " + i);
             if(i == numAttempts) {
                 if(!disablePrinting) {
                     System.out.println("Solution not found");
@@ -153,7 +157,7 @@ public class KnightTour {
         try {
             boardSize = Integer.parseInt(arg[0]);
             corner = Integer.parseInt(arg[1]);
-            numAttempts = arg.length == 3 ? Integer.parseInt(arg[2]) : 5;
+            numAttempts = arg.length == 3 ? Integer.parseInt(arg[2]) : DEFAULT_NO_OF_ATTEMPTS;
         } catch (NumberFormatException e) {
             printUsage();
             return;
