@@ -5,6 +5,9 @@ public class KnightTour {
 
     private int boardSize;
     private static final int DEFAULT_NO_OF_ATTEMPTS = 5;
+    public enum SolvingMethod {
+        WARNSDORFFS_RULE, BACKTRACKING
+    }
     private static ChessField board[][];
 
     private static final int xMove[] = { 2, 1, -1, -2, -2, -1,  1,  2 };
@@ -33,7 +36,7 @@ public class KnightTour {
         }
     }
 
-    private boolean solve(int x, int y, int moveIdx) {
+    private boolean solveUsingWarnsdorffsRule(int x, int y, int moveIdx) {
         int nextX, nextY;
         if (moveIdx == boardSize * boardSize) {
             return true;
@@ -47,8 +50,28 @@ public class KnightTour {
         nextX = bestNeighbour.getxPos();
         nextY = bestNeighbour.getyPos();
         board[nextX][nextY].setVal(moveIdx);
-        if (solve(nextX, nextY, moveIdx + 1)) {
+        if (solveUsingWarnsdorffsRule(nextX, nextY, moveIdx + 1)) {
             return true;
+        }
+        return false;
+    }
+
+    private boolean solveUsingBacktracking(int x, int y, int moveIdx) {
+        int nextX, nextY;
+        if (moveIdx == boardSize * boardSize) {
+            return true;
+        }
+
+        for(int i = 0; i < 8; i++) {
+            nextX = x + xMove[i];
+            nextY = y + yMove[i];
+            if(isValid(nextX, nextY)) {
+                board[nextX][nextY].setVal(moveIdx);
+                if (solveUsingBacktracking(nextX, nextY, moveIdx + 1)) {
+                    return true;
+                } else
+                    board[nextX][nextY].setVal(ChessField.NOT_VISITED);
+            }
         }
         return false;
     }
@@ -92,19 +115,28 @@ public class KnightTour {
         return minCandidates.get(new Random().nextInt(minCandidates.size()));
     }
 
-    public boolean solveKnightTourWrapper(int startX, int startY, int numAttempts, boolean disablePrinting) {
+    public boolean solveKnightTourWrapper(int startX, int startY, int numAttempts, boolean disablePrinting, SolvingMethod solvingMethod) {
         boardInit(startX, startY);
         int i = 1;
-        while(!solve(startX, startY, 1)) {
-            boardInit(startX, startY);
-            ++i;
-            if(i == numAttempts) {
-                if(!disablePrinting) {
-                    System.out.println("Solution not found");
+
+        switch (solvingMethod) {
+            case WARNSDORFFS_RULE:
+                while(!solveUsingWarnsdorffsRule(startX, startY, 1)) {
+                    boardInit(startX, startY);
+                    ++i;
+                    if(i == numAttempts) {
+                        if(!disablePrinting) {
+                            System.out.println("Solution not found");
+                        }
+                        return false;
+                    }
                 }
-                return false;
-            }
+                break;
+            case BACKTRACKING:
+                solveUsingBacktracking(startX, startY,1);
+                break;
         }
+
         if(!disablePrinting) {
             printSolution(i);
         }
@@ -148,16 +180,30 @@ public class KnightTour {
     }
 
     public static void main(String... arg) {
-        if(arg.length < 2 || arg.length > 3) {
+        if(arg.length < 2 || arg.length > 4) {
             printUsage();
             return;
         }
 
         int boardSize, corner, numAttempts, startX, startY;
+        SolvingMethod solvingMethod = SolvingMethod.WARNSDORFFS_RULE;
         try {
             boardSize = Integer.parseInt(arg[0]);
             corner = Integer.parseInt(arg[1]);
-            numAttempts = arg.length == 3 ? Integer.parseInt(arg[2]) : DEFAULT_NO_OF_ATTEMPTS;
+            if(arg.length >= 3)
+                switch(arg[2]) {
+                    case "warnsdorffs_rule":
+                        solvingMethod = SolvingMethod.WARNSDORFFS_RULE;
+                        break;
+                    case "backtracking":
+                        solvingMethod = SolvingMethod.BACKTRACKING;
+                        break;
+                    default:
+                        printUsage();
+                        break;
+                }
+
+            numAttempts = arg.length == 4 ? Integer.parseInt(arg[2]) : DEFAULT_NO_OF_ATTEMPTS;
         } catch (NumberFormatException e) {
             printUsage();
             return;
@@ -180,16 +226,19 @@ public class KnightTour {
             return;
         }
         KnightTour knightTour = new KnightTour(boardSize);
-        knightTour.solveKnightTourWrapper(startX, startY, numAttempts, false);
+        knightTour.solveKnightTourWrapper(startX, startY, numAttempts, false, solvingMethod);
     }
 
     private static void printUsage(){
         System.out.println("Usage:\n" +
-                "KnightTour <board_size> <start_corner> [<max_attempts>]\n" +
+                "KnightTour <board_size> <start_corner> [<method>] [<max_attempts>]\n" +
                 "Corner numbers:\n" +
                 "|0|_|1|\n" +
                 "|_|_|_|\n" +
                 "|3|_|2|\n" +
+                "Method (warnsdorffs_rule by default):\n" +
+                "warnsdorffs_rule\n" +
+                "backtracking\n" +
                 "max_attempts = 5 by default");
     }
 }
