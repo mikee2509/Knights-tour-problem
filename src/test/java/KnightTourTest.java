@@ -12,7 +12,8 @@ import static org.junit.Assert.assertTrue;
 public class KnightTourTest {
     private static final int MAX_TESTED_BOARD_SIZE = 80;
     private static final int MIN_TESTED_BOARD_SIZE = 5;
-    public static final int NUMBER_OF_ATTEMPTS = 10;
+    public static final int NUMBER_OF_ATTEMPTS = 1;
+    private static final KnightTour.SolvingMethod solvingMethod = KnightTour.SolvingMethod.WARNSDORFFS_RULE;
 
     private int boardSize;
     private int startX;
@@ -44,7 +45,7 @@ public class KnightTourTest {
     @Test
     public void solveKnightTourWrapper() {
         KnightTour knightTour = new KnightTour(boardSize);
-        assertTrue(knightTour.solveKnightTourWrapper(startX, startY, NUMBER_OF_ATTEMPTS, true));
+        assertTrue(knightTour.solveKnightTourWrapper(startX, startY, NUMBER_OF_ATTEMPTS, true, solvingMethod));
     }
 
 }
