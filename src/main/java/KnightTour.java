@@ -203,7 +203,7 @@ public class KnightTour {
                         break;
                 }
 
-            numAttempts = arg.length == 4 ? Integer.parseInt(arg[2]) : DEFAULT_NO_OF_ATTEMPTS;
+            numAttempts = arg.length == 4 ? Integer.parseInt(arg[3]) : DEFAULT_NO_OF_ATTEMPTS;
         } catch (NumberFormatException e) {
             printUsage();
             return;
